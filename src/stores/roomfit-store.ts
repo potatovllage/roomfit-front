@@ -29,6 +29,7 @@ interface RoomfitState {
   status: GenerationStatus
   error: string | null
   designId: string | null
+  isDemoDesign: boolean
   setImage: (file: File | null, previewUrl: string | null) => void
   setStyle: (style: string) => void
   setBudget: (budget: number) => void
@@ -36,6 +37,7 @@ interface RoomfitState {
   setStatus: (status: GenerationStatus) => void
   setError: (error: string | null) => void
   setDesignId: (designId: string | null) => void
+  setIsDemoDesign: (isDemoDesign: boolean) => void
   reset: () => void
 }
 
@@ -48,6 +50,7 @@ const initialState = {
   status: 'idle' as GenerationStatus,
   error: null,
   designId: null,
+  isDemoDesign: false,
 }
 
 export const useRoomfitStore = create<RoomfitState>()(
@@ -61,6 +64,7 @@ export const useRoomfitStore = create<RoomfitState>()(
       setStatus: (status) => set({ status }),
       setError: (error) => set({ error }),
       setDesignId: (designId) => set({ designId }),
+      setIsDemoDesign: (isDemoDesign) => set({ isDemoDesign }),
       reset: () => set(initialState),
     }),
     {

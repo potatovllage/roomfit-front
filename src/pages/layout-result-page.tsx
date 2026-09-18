@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { type FurnitureItem, useDesignJobQuery } from '@/api/roomfit'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { createDemoDesign } from '@/config/demo-data'
 import { useRoomfitStore } from '@/stores/roomfit-store'
 
 const formatWon = (value: number) => `${new Intl.NumberFormat('ko-KR').format(value)}원`
@@ -26,18 +27,18 @@ function FurnitureCard({ item, index, selected, onSelect }: { item: FurnitureIte
 export function LayoutResultPage() {
   const navigate = useNavigate()
   const [selectedFurniture, setSelectedFurniture] = useState(0)
-  const { designId, budget, setDesignId } = useRoomfitStore()
-  const designQuery = useDesignJobQuery(designId)
+  const { designId, budget, isDemoDesign, setDesignId, setIsDemoDesign } = useRoomfitStore()
+  const designQuery = useDesignJobQuery(isDemoDesign ? null : designId)
   if (!designId) return <Navigate to="/" replace />
 
-  const job = designQuery.data
+  const job = isDemoDesign ? createDemoDesign(budget) : designQuery.data
   if (designQuery.isPending || (job && !['succeeded', 'failed'].includes(job.status))) return <main className="grid min-h-screen place-items-center bg-white px-5 text-center text-[#171717]"><div><LoaderCircle className="mx-auto size-9 animate-spin" /><h1 className="mt-5 text-xl font-bold">AI가 배치안을 만들고 있어요</h1><p className="mt-2 text-sm text-[#5e5e5e]">{job?.status === 'analyzing' ? '방 사진을 분석하고 있어요.' : job?.status === 'selecting_products' ? '가구를 찾고 있어요.' : job?.status === 'rendering' ? '가구 배치 이미지를 만들고 있어요.' : '요청을 준비하고 있어요.'}</p><p className="mt-3 text-sm font-medium">{job?.progress ?? 0}%</p></div></main>
   if (designQuery.isError || job?.status === 'failed' || !job?.result) return <main className="grid min-h-screen place-items-center bg-white px-5 text-center"><div><h1 className="text-xl font-bold text-[#171717]">배치안을 만들지 못했어요</h1><p className="mt-2 text-sm text-[#5e5e5e]">{job?.error?.message ?? (designQuery.error instanceof Error ? designQuery.error.message : '잠시 후 다시 시도해 주세요.')}</p><Button onClick={() => { setDesignId(null); navigate('/') }} className="mt-6 bg-[#171717]">다시 시도하기</Button></div></main>
 
   const result = job.result
   const selectedItem = result.furniture_items[selectedFurniture]
   return <main className="min-h-screen bg-white px-5 py-12 text-[#171717] sm:px-8 lg:py-20"><section className="mx-auto max-w-[1200px]">
-    <Button variant="ghost" onClick={() => { setDesignId(null); navigate('/') }} className="mb-8 -ml-3 text-[#454545]"><ChevronLeft />다시 배치하기</Button>
+    <Button variant="ghost" onClick={() => { setDesignId(null); setIsDemoDesign(false); navigate('/') }} className="mb-8 -ml-3 text-[#454545]"><ChevronLeft />다시 배치하기</Button>
     <div className="mb-8 space-y-3"><h1 className="text-3xl font-bold tracking-[-0.04em]">AI가 이렇게 배치해봤어요</h1><p className="text-sm text-[#454545]">{result.summary}</p></div>
     <div className="relative h-[260px] overflow-hidden bg-[#f0f0f0] sm:h-[420px]" style={{ backgroundImage: `url(${result.rendered_image.url})`, backgroundPosition: 'center', backgroundSize: 'cover' }}>
       {result.furniture_items.map((item, index) => <button key={item.product_id} type="button" aria-label={`${item.name} 보기`} onClick={() => setSelectedFurniture(index)} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${item.placement.center_x * 100}%`, top: `${item.placement.center_y * 100}%` }}><NumberPin number={index + 1} /></button>)}

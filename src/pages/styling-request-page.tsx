@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { demoSourceImageUrl, demoThemes } from "@/config/demo-data";
 import { useRoomfitStore } from "@/stores/roomfit-store";
 
 const formatWon = (value: number) =>
@@ -28,9 +29,13 @@ export function StylingRequestPage() {
     setStatus,
     setError,
     setDesignId,
+    setIsDemoDesign,
   } = useRoomfitStore();
   const themesQuery = useThemesQuery();
   const createDesign = useCreateDesignMutation();
+  const useDemoData = !themesQuery.isPending && (themesQuery.isError || !themesQuery.data?.length);
+  const themes = useDemoData ? demoThemes : (themesQuery.data ?? []);
+  const activePreviewUrl = imagePreviewUrl ?? (useDemoData ? demoSourceImageUrl : null);
 
   const handleFile = (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return;
@@ -40,8 +45,17 @@ export function StylingRequestPage() {
   };
 
   const createSuggestion = () => {
-    if (!imageFile) return setError("방 사진을 먼저 업로드해 주세요.");
+    if (useDemoData) {
+      setError(null);
+      setStatus("completed");
+      if (!style) setStyle(demoThemes[0].code);
+      setIsDemoDesign(true);
+      setDesignId("demo-design");
+      navigate("/results");
+      return;
+    }
     if (!style) return setError("원하는 스타일을 선택해 주세요.");
+    if (!imageFile) return setError("방 사진을 먼저 업로드해 주세요.");
 
     setError(null);
     setStatus("generating");
@@ -97,9 +111,9 @@ export function StylingRequestPage() {
           tabIndex={0}
           className="flex h-[260px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d8d8d8] bg-[#f7f7f7] transition-colors hover:border-[#171717] hover:bg-[#f0f0f0] sm:h-[385px]"
         >
-          {imagePreviewUrl ? (
+          {activePreviewUrl ? (
             <img
-              src={imagePreviewUrl}
+              src={activePreviewUrl}
               alt="업로드한 방 미리보기"
               className="h-full w-full rounded-2xl object-cover"
             />
@@ -133,12 +147,8 @@ export function StylingRequestPage() {
           {themesQuery.isPending && (
             <p className="text-sm text-[#777]">스타일을 불러오는 중이에요.</p>
           )}
-          {themesQuery.isError && (
-            <p className="text-sm text-red-600">
-              스타일 목록을 불러오지 못했습니다. 인증 설정을 확인해 주세요.
-            </p>
-          )}
-          {themesQuery.data?.map((theme) => (
+          {useDemoData && <p className="w-full text-sm text-[#777]">백엔드 스타일 목록이 비어 있어 임시 데모 테마를 사용 중이에요.</p>}
+          {themes.map((theme) => (
             <button
               key={theme.code}
               type="button"
@@ -146,7 +156,7 @@ export function StylingRequestPage() {
               onClick={() => setStyle(theme.code)}
               className={cn(
                 "rounded-xl border px-4 py-3 text-sm font-medium transition",
-                style === theme.code
+                style === theme.code || (!style && useDemoData && theme.code === demoThemes[0].code)
                   ? "border-[#171717] bg-[#171717] text-white shadow-sm"
                   : "border-[#e0e0e0] bg-white text-[#454545] hover:border-[#171717]",
               )}
