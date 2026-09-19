@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-const apiBaseUrl = "http://43.203.208.230:8000";
+const apiBaseUrl = "https://circle-extend-felt-optimize.trycloudflare.com";
 const accessToken = import.meta.env.VITE_ROOMFIT_API_TOKEN;
 
 export interface Theme {
@@ -145,7 +145,7 @@ export function useDesignJobQuery(designId: string | null) {
       const job = query.state.data;
       if (!job || job.status === "succeeded" || job.status === "failed")
         return false;
-      return job.poll_after_ms ?? 1000;
+      return job.poll_after_ms ?? 5000;
     },
   });
 }
