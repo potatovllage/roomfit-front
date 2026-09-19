@@ -24,10 +24,30 @@ const themeColors: Record<string, string> = {
 };
 
 const sources = [
-  { id: "ikea", label: "이케아", image: "/figma-assets/ikea.png", imageClass: "w-11" },
-  { id: "ohouse", label: "오늘의 집", image: "/figma-assets/ohouse.png", imageClass: "size-4" },
-  { id: "barahouse", label: "바라하우스", image: "/figma-assets/barahouse.png", imageClass: "h-4 w-7" },
-  { id: "someanddeco", label: "썸앤데코", image: "/figma-assets/someanddeco.png", imageClass: "size-4" },
+  {
+    id: "ikea",
+    label: "이케아",
+    image: "/figma-assets/ikea.png",
+    imageClass: "w-11",
+  },
+  {
+    id: "ohouse",
+    label: "오늘의 집",
+    image: "/figma-assets/ohouse.png",
+    imageClass: "size-4",
+  },
+  {
+    id: "barahouse",
+    label: "바라하우스",
+    image: "/figma-assets/barahouse.png",
+    imageClass: "h-4 w-7",
+  },
+  {
+    id: "someanddeco",
+    label: "썸앤데코",
+    image: "/figma-assets/someanddeco.png",
+    imageClass: "size-4",
+  },
 ];
 
 export function StylingRequestPage() {
@@ -35,15 +55,26 @@ export function StylingRequestPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const {
-    imageFile, imagePreviewUrl, style, budget, request, setImage, setStyle,
-    setBudget, setRequest, setStatus, setError, setDesignId,
+    imageFile,
+    imagePreviewUrl,
+    style,
+    budget,
+    request,
+    setImage,
+    setStyle,
+    setBudget,
+    setRequest,
+    setStatus,
+    setError,
+    setDesignId,
   } = useRoomfitStore();
   const themesQuery = useThemesQuery();
   const createDesign = useCreateDesignMutation();
 
   const handleFile = (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return;
-    if (imagePreviewUrl?.startsWith("blob:")) URL.revokeObjectURL(imagePreviewUrl);
+    if (imagePreviewUrl?.startsWith("blob:"))
+      URL.revokeObjectURL(imagePreviewUrl);
     setImage(file, URL.createObjectURL(file));
   };
 
@@ -70,7 +101,11 @@ export function StylingRequestPage() {
         },
         onError: (error) => {
           setStatus("failed");
-          setError(error instanceof Error ? error.message : "배치 요청에 실패했습니다.");
+          setError(
+            error instanceof Error
+              ? error.message
+              : "배치 요청에 실패했습니다.",
+          );
         },
       },
     );
@@ -84,7 +119,12 @@ export function StylingRequestPage() {
       <header className="relative z-20 h-[84px] border-b border-[#e0e0e0] bg-white">
         <div className="mx-auto flex h-full max-w-[1680px] items-center justify-between px-5 sm:px-10 lg:px-[120px]">
           <span className="text-lg font-bold tracking-[-0.05em]">룸핏</span>
-          <Button onClick={() => fileInputRef.current?.click()} className="h-auto rounded-lg bg-[#171717] px-5 py-3 text-sm font-medium hover:bg-[#303030]">인테리어 시작하기</Button>
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            className="h-auto rounded-lg bg-[#171717] px-5 py-3 text-sm font-medium hover:bg-[#303030]"
+          >
+            인테리어 시작하기
+          </Button>
         </div>
       </header>
 
@@ -93,12 +133,20 @@ export function StylingRequestPage() {
         <div className="absolute -right-52 -top-80 size-[720px] rounded-full bg-white/75 blur-[105px]" />
         <h1 className="relative z-10 text-[clamp(30px,3.2vw,48px)] leading-[1.38] tracking-[-0.055em] text-white">
           <span className="block font-light">느낌 좋은 인테리어부터</span>
-          <strong className="font-extrabold">흩어져 있는 가구 최저가까지</strong>
+          <strong className="font-extrabold">
+            흩어져 있는 가구 최저가까지
+          </strong>
         </h1>
       </section>
 
       <section className="relative z-10 mx-auto -mt-[42px] max-w-[1200px] px-5 pb-16 sm:px-8 lg:px-0 lg:pb-24">
-        <input ref={fileInputRef} className="hidden" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => handleFile(event.target.files?.[0])} />
+        <input
+          ref={fileInputRef}
+          className="hidden"
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          onChange={(event) => handleFile(event.target.files?.[0])}
+        />
         <div
           onClick={() => fileInputRef.current?.click()}
           onKeyDown={(event) => {
@@ -117,29 +165,76 @@ export function StylingRequestPage() {
           className="flex h-[260px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-[1.5px] border-dashed border-[#d8d8d8] bg-white shadow-[0_2px_8px_rgba(31,36,33,.08)] transition-colors hover:border-[#171717] sm:h-[361px]"
         >
           {imagePreviewUrl ? (
-            <img src={imagePreviewUrl} alt="업로드한 방 미리보기" className="h-full w-full object-cover" />
+            <img
+              src={imagePreviewUrl}
+              alt="업로드한 방 미리보기"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <>
               <Camera className="mb-3 size-12 stroke-[1.8]" />
-              <p className="text-sm font-semibold">클릭하거나 파일을 끌어다 놓아주세요</p>
-              <p className="mt-2 text-xs text-[#5e5e5e]">JPG, PNG, WebP · 최대 20MB</p>
-              <Button type="button" onClick={(event) => { event.stopPropagation(); fileInputRef.current?.click(); }} className="mt-7 h-auto rounded-lg bg-[#171717] px-6 py-3 text-sm font-medium hover:bg-[#0EA5A0]">
-                <Upload className="size-4" />파일 선택하기
+              <p className="text-sm font-semibold">
+                클릭하거나 파일을 끌어다 놓아주세요
+              </p>
+              <p className="mt-2 text-xs text-[#5e5e5e]">
+                JPG, PNG, WebP · 최대 20MB
+              </p>
+              <Button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                className="mt-7 h-auto rounded-lg bg-[#171717] px-6 py-3 text-sm font-medium hover:bg-[#0EA5A0]"
+              >
+                <Upload className="size-4" />
+                파일 선택하기
               </Button>
             </>
           )}
         </div>
-        <p className="mt-3 text-center text-xs text-[#5e5e5e]">방 전체가 잘 보이는 사진일수록 배치 제안 정확도가 올라가요</p>
+        <p className="mt-3 text-center text-xs text-[#5e5e5e]">
+          방 전체가 잘 보이는 사진일수록 배치 제안 정확도가 올라가요
+        </p>
 
         <div className="mt-8 space-y-7">
           <div>
             <h2 className="mb-4 text-sm font-bold">분위기</h2>
             <div className="flex flex-wrap gap-3">
-              {themesQuery.isPending && <p className="text-sm text-[#777]">스타일을 불러오는 중이에요.</p>}
-              {themesQuery.isError && <p className="text-sm text-red-600">스타일 목록을 불러오지 못했습니다.</p>}
+              {themesQuery.isPending && (
+                <p className="text-sm text-[#777]">
+                  스타일을 불러오는 중이에요.
+                </p>
+              )}
+              {themesQuery.isError && (
+                <p className="text-sm text-red-600">
+                  스타일 목록을 불러오지 못했습니다.
+                </p>
+              )}
               {themesQuery.data?.map((theme) => (
-                <button key={theme.code} type="button" title={theme.description} onClick={() => setStyle(theme.code)} className={cn("inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-[15px] font-medium transition", style === theme.code ? "border-2 border-[#171717] px-[15px] py-[11px] font-bold" : "border-[#e0e0e0] hover:border-[#171717]")}>
-                  <span className={cn("size-3.5 rounded-full", themeColors[theme.code] ?? "bg-[#8e99a8]")} />
+                <button
+                  key={theme.code}
+                  type="button"
+                  title={theme.description}
+                  onClick={() => setStyle(theme.code)}
+                  style={
+                    style === theme.code
+                      ? { borderColor: "#171717" }
+                      : undefined
+                  }
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-[15px] font-medium transition",
+                    style === theme.code
+                      ? "border-2 border-[#171717] px-[15px] py-[11px] font-bold"
+                      : "border-[#e0e0e0] hover:border-[#171717]",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "size-3.5 rounded-full",
+                      themeColors[theme.code] ?? "bg-[#8e99a8]",
+                    )}
+                  />
                   {theme.name}
                 </button>
               ))}
@@ -150,8 +245,28 @@ export function StylingRequestPage() {
             <h2 className="mb-4 text-sm font-bold">출처</h2>
             <div className="flex flex-wrap gap-3">
               {sources.map((source) => (
-                <button key={source.id} type="button" aria-pressed={selectedSources.includes(source.id)} onClick={() => toggleSource(source.id)} className={cn("inline-flex h-11 items-center gap-2 rounded-xl border bg-white px-4 text-[15px] font-medium transition", selectedSources.includes(source.id) ? "border-2 border-[#171717] px-[15px]" : "border-[#e0e0e0] hover:border-[#171717]")}>
-                  <img src={source.image} alt="" className={cn("object-contain", source.imageClass)} />
+                <button
+                  key={source.id}
+                  type="button"
+                  aria-pressed={selectedSources.includes(source.id)}
+                  onClick={() => toggleSource(source.id)}
+                  style={
+                    selectedSources.includes(source.id)
+                      ? { borderColor: "#171717" }
+                      : undefined
+                  }
+                  className={cn(
+                    "inline-flex h-11 items-center gap-2 rounded-xl border bg-white px-4 text-[15px] font-medium transition",
+                    selectedSources.includes(source.id)
+                      ? "border-2 border-[#171717] px-[15px]"
+                      : "border-[#171717] hover:border-[#171717]",
+                  )}
+                >
+                  <img
+                    src={source.image}
+                    alt=""
+                    className={cn("object-contain", source.imageClass)}
+                  />
                   {source.label}
                 </button>
               ))}
@@ -160,22 +275,55 @@ export function StylingRequestPage() {
 
           <div>
             <h2 className="mb-4 text-sm font-bold">예산 설정</h2>
-            <Slider value={[budget]} min={100000} max={10000000} step={50000} onValueChange={([value]) => setBudget(value)} className="[&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-[#171717] [&_[data-slot=slider-range]]:bg-[#171717]" />
-            <p className="mt-3 text-sm font-medium text-[#454545]">{formatWon(budget)}까지</p>
+            <Slider
+              value={[budget]}
+              min={100000}
+              max={10000000}
+              step={50000}
+              onValueChange={([value]) => setBudget(value)}
+              className="[&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-[#171717] [&_[data-slot=slider-range]]:bg-[#171717]"
+            />
+            <p className="mt-3 text-sm font-medium text-[#454545]">
+              {formatWon(budget)}까지
+            </p>
           </div>
 
           <div>
-            <Textarea value={request} onChange={(event) => setRequest(event.target.value)} placeholder="예: 창가 쪽에 식물이랑 러그 놓고 싶어요" className="min-h-40 resize-none rounded-lg border-[#e0e0e0] p-4 text-sm shadow-none focus-visible:border-[#171717] focus-visible:ring-[#171717]/20 sm:min-h-[236px]" />
-            <p className="mt-3 text-xs text-[#5e5e5e]">추가로 원하는 스타일이 있다면 자유롭게 적어주세요 (선택)</p>
+            <Textarea
+              value={request}
+              onChange={(event) => setRequest(event.target.value)}
+              placeholder="예: 창가 쪽에 식물이랑 러그 놓고 싶어요"
+              className="min-h-40 resize-none rounded-lg border-[#e0e0e0] p-4 text-sm shadow-none focus-visible:border-[#171717] focus-visible:ring-[#171717]/20 sm:min-h-[236px]"
+            />
+            <p className="mt-3 text-xs text-[#5e5e5e]">
+              추가로 원하는 스타일이 있다면 자유롭게 적어주세요 (선택)
+            </p>
           </div>
         </div>
 
-        {requestError && <p role="alert" className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">{requestError}</p>}
-        <Button onClick={createSuggestion} disabled={isSubmitting} className="mt-7 h-[68px] w-full rounded-xl bg-[linear-gradient(3deg,#000_15%,#333_85%)] text-lg font-bold shadow-[0_8px_20px_rgba(0,0,0,.30)] hover:bg-[#303030]">
-          {isSubmitting ? <LoaderCircle className="animate-spin" /> : <ImagePlus className="size-[22px]" />}
+        {requestError && (
+          <p
+            role="alert"
+            className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          >
+            {requestError}
+          </p>
+        )}
+        <Button
+          onClick={createSuggestion}
+          disabled={isSubmitting}
+          className="mt-7 h-[62px] w-full rounded-xl bg-[linear-gradient(3deg,#000_15%,#333_85%)] text-lg font-bold shadow-[0_8px_20px_rgba(0,0,0,.30)] hover:bg-[#303030]"
+        >
+          {isSubmitting ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <ImagePlus className="size-[22px]" />
+          )}
           {isSubmitting ? "AI 배치안을 요청하고 있어요" : "AI 배치 제안 받기"}
         </Button>
-        <p className="mt-4 text-center text-[13px] text-[#5e5e5e]">약 15초 안에 3가지 배치안을 받아보세요</p>
+        <p className="mt-4 text-center text-[13px] text-[#5e5e5e]">
+          약 15초 안에 3가지 배치안을 받아보세요
+        </p>
       </section>
     </main>
   );
