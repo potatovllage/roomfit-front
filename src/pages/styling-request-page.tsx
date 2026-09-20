@@ -31,12 +31,6 @@ const sources = [
     imageClass: "w-11",
   },
   {
-    id: "ohouse",
-    label: "오늘의 집",
-    image: "/figma-assets/ohouse.png",
-    imageClass: "size-4",
-  },
-  {
     id: "barahouse",
     label: "바라하우스",
     image: "/figma-assets/barahouse.png",
