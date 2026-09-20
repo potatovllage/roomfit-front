@@ -175,6 +175,9 @@ export function LayoutResultPage() {
     );
 
   const result = job.result;
+  const selectedItem = result.furniture_items[selectedFurniture];
+  const popupOpensLeft = selectedItem?.placement.center_x > 0.62;
+  const popupOpensUp = selectedItem?.placement.center_y > 0.58;
   return (
     <main className="min-h-screen bg-white px-5 py-12 text-[#171717] sm:px-8 lg:py-20">
       <section className="mx-auto max-w-[1200px]">
@@ -194,6 +197,68 @@ export function LayoutResultPage() {
             AI가 이렇게 배치해봤어요
           </h1>
           <p className="text-sm text-[#454545]">{result.summary}</p>
+        </div>
+
+        <div className="relative h-[260px] overflow-hidden bg-[#f0f0f0] sm:h-[420px]">
+          <img
+            src={result.rendered_image.url}
+            alt="AI가 제안한 가구 배치"
+            className="absolute inset-0 size-full object-cover"
+          />
+          {result.furniture_items.map((item, index) => (
+            <button
+              key={item.product_id}
+              type="button"
+              aria-label={`${item.name} 보기`}
+              onClick={() => setSelectedFurniture(index)}
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${item.placement.center_x * 100}%`,
+                top: `${item.placement.center_y * 100}%`,
+              }}
+            >
+              <NumberPin number={index + 1} />
+            </button>
+          ))}
+          {selectedItem && <div
+            className="absolute z-20 hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_2px_8px_rgba(31,36,33,.16)] sm:block"
+            style={{
+              left: `${selectedItem.placement.center_x * 100}%`,
+              top: `${selectedItem.placement.center_y * 100}%`,
+              transform: `translate(${popupOpensLeft ? "calc(-100% - 18px)" : "18px"}, ${popupOpensUp ? "calc(-100% - 18px)" : "18px"})`,
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src={selectedItem.image_url}
+                alt=""
+                className="size-16 rounded-xl bg-[#e0e0e0] object-cover"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-base font-bold">
+                  {selectedItem.name}
+                </p>
+                <p className="mt-1 text-sm text-[#454545]">
+                  {selectedItem.merchant}에서 구매 예정
+                </p>
+              </div>
+              <strong className="shrink-0 text-lg">
+                {formatWon(selectedItem.subtotal)}
+              </strong>
+            </div>
+            <Button
+              asChild
+              className="mt-4 h-12 w-full rounded-xl bg-[#171717] text-base hover:bg-[#303030]"
+            >
+              <a
+                href={selectedItem.shopping_url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                이동하기
+              </a>
+            </Button>
+          </div>}
         </div>
 
         <h2 className="mb-8 mt-8 text-lg font-bold">
