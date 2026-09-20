@@ -80,6 +80,7 @@ export interface CreateDesignInput {
   theme: string;
   maxAmount: number;
   prompt?: string;
+  sources?: string[];
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -116,6 +117,7 @@ export function useCreateDesignMutation() {
       theme,
       maxAmount,
       prompt,
+      sources,
     }: CreateDesignInput) => {
       const formData = new FormData();
       formData.append("image", image);
@@ -126,6 +128,7 @@ export function useCreateDesignMutation() {
       formData.append("preserve_existing_furniture", "true");
       formData.append("exclude_out_of_stock", "true");
       if (prompt?.trim()) formData.append("prompt", prompt.trim());
+      sources?.forEach((source) => formData.append("sources", source));
 
       return request<DesignJobAccepted>("/api/v1/designs", {
         method: "POST",

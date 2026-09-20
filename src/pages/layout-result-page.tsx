@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, LoaderCircle } from "lucide-react";
+import { ChevronLeft, LoaderCircle, X } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 import { type FurnitureItem, useDesignJobQuery } from "@/api/roomfit";
@@ -126,7 +126,9 @@ function FurnitureCard({
 
 export function LayoutResultPage() {
   const navigate = useNavigate();
-  const [selectedFurniture, setSelectedFurniture] = useState(0);
+  const [selectedFurniture, setSelectedFurniture] = useState<number | null>(
+    null,
+  );
   const { designId, budget, setDesignId } = useRoomfitStore();
   const designQuery = useDesignJobQuery(designId);
   const job = designQuery.data;
@@ -175,9 +177,12 @@ export function LayoutResultPage() {
     );
 
   const result = job.result;
-  const selectedItem = result.furniture_items[selectedFurniture];
-  const popupOpensLeft = selectedItem?.placement.center_x > 0.62;
-  const popupOpensUp = selectedItem?.placement.center_y > 0.58;
+  const selectedItem =
+    selectedFurniture === null
+      ? null
+      : result.furniture_items[selectedFurniture];
+  const popupOpensLeft = (selectedItem?.placement?.center_x ?? 0) > 0.62;
+  const popupOpensUp = (selectedItem?.placement?.center_y ?? 0) > 0.58;
   return (
     <main className="min-h-screen bg-white px-5 py-12 text-[#171717] sm:px-8 lg:py-20">
       <section className="mx-auto max-w-[1200px]">
@@ -225,9 +230,17 @@ export function LayoutResultPage() {
             style={{
               left: `${selectedItem.placement.center_x * 100}%`,
               top: `${selectedItem.placement.center_y * 100}%`,
-              transform: `translate(${popupOpensLeft ? "calc(-100% - 18px)" : "18px"}, ${popupOpensUp ? "calc(-100% - 18px)" : "18px"})`,
+              transform: `translate(${popupOpensLeft ? "calc(-100% - 8px)" : "8px"}, ${popupOpensUp ? "calc(-100% - 8px)" : "8px"})`,
             }}
           >
+            <button
+              type="button"
+              aria-label="가구 정보 팝업 닫기"
+              onClick={() => setSelectedFurniture(null)}
+              className="absolute right-3 top-3 rounded-md p-1 text-[#5e5e5e] transition-colors hover:bg-[#f2f2f2] hover:text-[#171717]"
+            >
+              <X className="size-4" />
+            </button>
             <div className="flex items-center gap-3">
               <img
                 src={selectedItem.image_url}

@@ -43,7 +43,7 @@ const sources = [
     imageClass: "h-4 w-7",
   },
   {
-    id: "someanddeco",
+    id: "ssomendeco",
     label: "썸앤데코",
     image: "/figma-assets/someanddeco.png",
     imageClass: "size-4",
@@ -94,7 +94,13 @@ export function StylingRequestPage() {
     setError(null);
     setStatus("generating");
     createDesign.mutate(
-      { image: imageFile, theme: style, maxAmount: budget, prompt: request },
+      {
+        image: imageFile,
+        theme: style,
+        maxAmount: budget,
+        prompt: request,
+        sources: selectedSources,
+      },
       {
         onSuccess: (job) => {
           if (imagePreviewUrl?.startsWith("blob:")) {
