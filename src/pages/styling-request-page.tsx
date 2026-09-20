@@ -248,7 +248,7 @@ export function StylingRequestPage() {
           </div>
 
           <div>
-            <h2 className="mb-4 text-sm font-bold">출처</h2>
+            <h2 className="mb-4 text-sm font-bold">브랜드</h2>
             <div className="flex flex-wrap gap-3">
               {sources.map((source) => (
                 <button
