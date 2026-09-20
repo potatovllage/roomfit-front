@@ -67,6 +67,7 @@ export function StylingRequestPage() {
     setStatus,
     setError,
     setDesignId,
+    clearDraft,
   } = useRoomfitStore();
   const themesQuery = useThemesQuery();
   const createDesign = useCreateDesignMutation();
@@ -96,6 +97,11 @@ export function StylingRequestPage() {
       { image: imageFile, theme: style, maxAmount: budget, prompt: request },
       {
         onSuccess: (job) => {
+          if (imagePreviewUrl?.startsWith("blob:")) {
+            URL.revokeObjectURL(imagePreviewUrl);
+          }
+          clearDraft();
+          setSelectedSources([]);
           setDesignId(job.design_id);
           navigate("/results");
         },

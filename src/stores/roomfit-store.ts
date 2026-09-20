@@ -30,12 +30,13 @@ interface RoomfitState {
   error: string | null
   designId: string | null
   setImage: (file: File | null, previewUrl: string | null) => void
-  setStyle: (style: string) => void
+  setStyle: (style: string | null) => void
   setBudget: (budget: number) => void
   setRequest: (request: string) => void
   setStatus: (status: GenerationStatus) => void
   setError: (error: string | null) => void
   setDesignId: (designId: string | null) => void
+  clearDraft: () => void
   reset: () => void
 }
 
@@ -61,6 +62,15 @@ export const useRoomfitStore = create<RoomfitState>()(
       setStatus: (status) => set({ status }),
       setError: (error) => set({ error }),
       setDesignId: (designId) => set({ designId }),
+      clearDraft: () => set({
+        imageFile: null,
+        imagePreviewUrl: null,
+        style: null,
+        budget: initialState.budget,
+        request: '',
+        status: 'idle',
+        error: null,
+      }),
       reset: () => set(initialState),
     }),
     {
