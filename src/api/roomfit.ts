@@ -144,11 +144,17 @@ export function useDesignJobQuery(designId: string | null) {
     queryKey: roomfitQueryKeys.design(designId ?? ""),
     queryFn: () => request<DesignJob>(`/api/v1/designs/${designId}`),
     enabled: Boolean(designId),
+    refetchIntervalInBackground: true,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
     refetchInterval: (query) => {
       const job = query.state.data;
       if (!job || job.status === "succeeded" || job.status === "failed")
         return false;
-      return job.poll_after_ms ?? 5000;
+      return Math.max(job.poll_after_ms ?? 5000, 5000);
     },
   });
 }
